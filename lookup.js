@@ -14,6 +14,8 @@ function getMatchingMaterials() {
     xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = createCallback(xmlHttp, query);
     xmlHttp.open("GET", url, true);
+    xmlHttp.timeout = 30000;
+    xmlHttp.ontimeout = createTimeout(xmlHttp, query);
     xmlHttp.send(null);
 }
 
@@ -31,7 +33,7 @@ function createCallback(xhr, query) {
                 $('#queryHead').html('<div class="bg-info" ><a href="' + xhr.responseURL + '">' + query + '</a></div>');
                 $('#resultList').html('<div class="bg-info">done</div>');
                 tableHtml = '<table>';
-                $(xhr.responseText).find('result').each(function(i,e) {
+                $(xhr.responseText).find('result').each(function (i, e) {
                     tableHtml += '<tr><td>';
                     tableHtml += $(e).find('[name="materialName"] > literal').html();
                     tableHtml += '</td><td>';
@@ -39,13 +41,20 @@ function createCallback(xhr, query) {
                     tableHtml += '</td></tr>';
                 });
                 tableHtml += '</table>';
-                $('#resultList').html('<div class="bg-info">'+tableHtml+'</div>');
-                
+                $('#resultList').html('<div class="bg-info">' + tableHtml + '</div>');
+
                 $('#resultList > div').show(250);
             } else {
                 $('#queryHead').html('<div class="bg-danger" ><a href="' + xhr.responseURL + '">' + query + '</a></div>');
                 $('#resultList').html('<div class="bg-danger"> Error: Request status - ' + xhr.status + ' : ' + xhr.responseText + '</div>');
             }
         }
+    };
+}
+
+function createTimeout(xhr, query) {
+    return function () {
+        $('#queryHead').html('<div class="bg-danger" ><a href="' + xhr.responseURL + '">' + query + '</a></div>');
+        $('#resultList').html('<div class="bg-danger"> Request timed out</div>');
     };
 }
