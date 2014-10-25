@@ -1,12 +1,15 @@
 var xmlHttp = null;
 function getMatchingMaterials() {
     var query = document.getElementById("query").value;
-    var sparql = "select DISTINCT ?materialUri ?materialName "
-            + " where  { "
-            + " ?materialUri (<http://www.w3.org/2000/01/rdf-schema#subClassOf>)+ <http://xsb.com/swiss/material#MATERIAL> . "
-            + " ?materialUri <http://www.w3.org/2000/01/rdf-schema#label> ?materialName . "
-            + " FILTER (regex(?materialName, '" + query + "')) "
-            + " } ORDER BY ?materialName";
+    var sparql = "select DISTINCT ?materialUri ?materialName " +
+                 "{ " +
+                 "  graph <http://xsb.com/swiss/merged_ontology> { " +
+                 "    ( ?materialName  ) <http://jena.hpl.hp.com/ARQ/property#textMatch> ( '" + query + "*' 0.0 50000 ).  " +
+                 "    ?materialUri <http://www.w3.org/2000/01/rdf-schema#label> ?materialName . " +
+                 "  ?materialUri (<http://www.w3.org/2000/01/rdf-schema#subClassOf>)+ <http://xsb.com/swiss/material#MATERIAL> .  " +
+                 " } " +
+                 "} ORDER BY ?materialName";
+
     var url = "http://api.xsb.com/sparql/query?query=" + encodeURIComponent(sparql);
     $('#queryHead').html('<div class="bg-warning" ><a href="' + url + '">' + query + '...</a></div>');
     $('#resultList').html('<div class="bg-warning">searching...</div>');
