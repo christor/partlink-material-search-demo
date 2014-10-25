@@ -20,23 +20,38 @@ and open the template in the editor.
         <!-- Latest compiled and minified JavaScript -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
     </head>
-    <body>
-        <form class="form-inline" role="form" onsubmit="return false;">
-            <div class="form-group">
-            <label class="sr-only" for="query" >Enter material name to search for</label>
-            <input class="form-control" type="text" name="cn" value="" id="query"/>
-            <button class="btn btn-default" type="submit" name="stdBut" id="btn" onclick="getMatchingMaterials();">Search</button>
-            </div>
-        </form>
+    <body style="padding: 5px">
+        <h1>Material Search</h1>
+
+
         <div>
-            <div id="queryHead" style="padding-bottom: 2px;">
+            <form class="form-inline" role="form" onsubmit="return false;">
+                <div class="form-group">
+                    <label class="sr-only" for="query" >Enter material name to search for</label>
+                    <input class="form-control" type="text" name="cn" value="" id="query" placeholder="Material Name" style="min-width: 300px"/>
+                    <button class="btn btn-default" type="submit" name="stdBut" id="btn" onclick="getMatchingMaterials();">Search</button>
+                </div>
+                <div style="font-size-adjust: -4 ">
+                    <i>(Search term may include <a href="http://lucene.apache.org/core/2_9_4/queryparsersyntax.html#Proximity Searches">Lucene modifiers</a>)</i>
+                </div>
+            </form>
+        </div>
+        <div style="padding: 5px; margin-top: 10px">
+            <div style="padding-bottom: 2px;">
+                Results: <span id="queryHead" ></span>
             </div>
-            <div id="resultList" style="max-height: 100px; overflow: scroll">
+            <div style="min-height: 200px; border: #8699a4 thin solid ">
+                <div id="resultList" style="max-height: 200px; overflow: scroll">
+                </div>
             </div>
         </div>
-        <textarea id="sparqllog" cols="80">
-            
-        </textarea>
+        <div style="padding: 5px; margin-top: 10px">
+            Query Log:
+            <div>
+                <div id="sparqllog" style="max-height: 200px; overflow: scroll">
+                </div>
+            </div>
+        </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     </body>
 </html>

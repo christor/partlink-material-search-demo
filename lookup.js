@@ -4,21 +4,21 @@ function getMatchingMaterials() {
     var sparql = "select DISTINCT ?materialUri ?materialName " +
                  "{ " +
                  "  graph <http://xsb.com/swiss/merged_ontology> { " +
-                 "    ( ?materialName  ) <http://jena.hpl.hp.com/ARQ/property#textMatch> ( '" + query + "*' 0.0 50000 ).  " +
+                 "    ( ?materialName  ) <http://jena.hpl.hp.com/ARQ/property#textMatch> ( '" + query + "' 0.0 50000 ).  " +
                  "    ?materialUri <http://www.w3.org/2000/01/rdf-schema#label> ?materialName . " +
                  "  ?materialUri (<http://www.w3.org/2000/01/rdf-schema#subClassOf>)+ <http://xsb.com/swiss/material#MATERIAL> .  " +
                  " } " +
                  "} ORDER BY ?materialName";
 
     var url = "http://api.xsb.com/sparql/query?query=" + encodeURIComponent(sparql);
-    $('#queryHead').html('<div class="bg-warning" ><a href="' + url + '">' + query + '...</a></div>');
+    $('#queryHead').html('<a href="' + url + '">' + query + '...</a>');
     $('#resultList').html('<div class="bg-warning">searching...</div>');
-    logSparql(sparql);
+    logSparql("Executing query: " + sparql + " \n (URL: <a href='" + url + "'>" + url + "</a>)");
     xmlHttp = new XMLHttpRequest();
-    xmlHttp.onreadystatechange = createCallback(xmlHttp, query);
     xmlHttp.open("GET", url, true);
     xmlHttp.timeout = 30000;
-    xmlHttp.ontimeout = createTimeout(xmlHttp, query);
+    xmlHttp.ontimeout = createTimeout(xmlHttp, query, new Date().getTime());
+    xmlHttp.onreadystatechange = createCallback(xmlHttp, query, new Date().getTime());
     xmlHttp.send(null);
 }
 
@@ -26,14 +26,14 @@ function logSparql(sparql) {
     var d = new Date();
     var dd = d.toLocaleDateString();
     var dt = d.toLocaleTimeString();
-    $('#sparqllog').val('[' + dd + ' ' + dt + '] ' + sparql + '\n' + $('#sparqllog').val());
+    $('#sparqllog').prepend('<div style="border: #8699a4 thin solid">[' + dd + ' ' + dt + '] ' + sparql + '</div>');
 }
 
-function createCallback(xhr, query) {
+function createCallback(xhr, query, start) {
     return function ProcessRequest() {
         if (xhr.readyState === 4) {
             if (xhr.status === 200) {
-                $('#queryHead').html('<div class="bg-info" ><a href="' + xhr.responseURL + '">' + query + '</a></div>');
+                $('#queryHead').html('for query <a href="' + xhr.responseURL + '">' + query + '</a> (took ' + (new Date().getTime()-start) + " ms)");
                 $('#resultList').html('<div class="bg-info">done</div>');
                 tableHtml = '<table>';
                 $(xhr.responseText).find('result').each(function (i, e) {
@@ -48,16 +48,16 @@ function createCallback(xhr, query) {
 
                 $('#resultList > div').show(250);
             } else {
-                $('#queryHead').html('<div class="bg-danger" ><a href="' + xhr.responseURL + '">' + query + '</a></div>');
+                $('#queryHead').html('for query <a href="' + xhr.responseURL + '">' + query + '</a>');
                 $('#resultList').html('<div class="bg-danger"> Error: Request status - ' + xhr.status + ' : ' + xhr.responseText + '</div>');
             }
         }
     };
 }
 
-function createTimeout(xhr, query) {
+function createTimeout(xhr, query, start) {
     return function () {
-        $('#queryHead').html('<div class="bg-danger" ><a href="' + xhr.responseURL + '">' + query + '</a></div>');
+        $('#queryHead').html('<a href="' + xhr.responseURL + '">' + query + '</a>');
         $('#resultList').html('<div class="bg-danger"> Request timed out</div>');
     };
 }
